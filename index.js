@@ -59,6 +59,37 @@ app.post("/api/players", async (req, res) => {
 	}
 });
 
+app.put("/api/players", async (req, res) => {
+	try {
+		console.log(req.body);
+
+		const winningPlayers = req.body.winningTeamPlayers;
+		const losingPlayers = req.body.losingTeamPlayers;
+
+		for (winningPlayer in winningPlayers) {
+			const updatedWinningPlayer = new VolleyballPlayer({
+				wins: winningPlayer.wins + 1,
+			});
+
+			await VolleyballPlayer.findByIdAndUpdate(winningPlayer._id, updatedWinningPlayer);
+		}
+
+		for (losingPlayer in losingPlayers) {
+			const updatedLosingPlayer = new VolleyballPlayer({
+				wins: losingPlayer.losses + 1,
+			});
+
+			await VolleyballPlayer.findByIdAndUpdate(losingPlayer._id, updatedLosingPlayer);
+		}
+
+		res.json("Players updated.");
+	} catch (error) {
+		res.status(500).json({
+			error: "An error occurred while updating volleyball players.",
+		});
+	}
+});
+
 app.put("/api/players/:slug", async (req, res) => {
 	const slugParam = req.params.slug;
 
@@ -73,7 +104,7 @@ app.put("/api/players/:slug", async (req, res) => {
 		res.json("Player updated.");
 	} catch (error) {
 		res.status(500).json({
-			error: "An error occurred while creating volleyball player.",
+			error: "An error occurred while updating volleyball player.",
 		});
 	}
 });
