@@ -108,6 +108,8 @@ app.put("/api/players/:slug", async (req, res) => {
 
 		const updatedPlayer = {
 			name: req.body.name,
+			wins: req.body.wins,
+			losses: req.body.losses,
 		};
 
 		await VolleyballPlayer.findByIdAndUpdate(slugParam, updatedPlayer);
