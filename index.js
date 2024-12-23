@@ -119,6 +119,18 @@ app.put("/api/players/:slug", async (req, res) => {
 	}
 });
 
+app.put("/api/reset-players", async (req, res) => {
+	try {
+		await VolleyballPlayer.updateMany({}, { $set: { wins: 0, losses: 0 } });
+		res.json("All player wins and losses reset to 0.");
+	} catch (error) {
+		console.error("Error resetting player stats:", error);
+		res.status(500).json({
+			error: "An error occurred while resetting player stats.",
+		});
+	}
+});
+
 app.delete("/api/players/:id", async (req, res) => {
 	const playerId = req.params.id;
 
