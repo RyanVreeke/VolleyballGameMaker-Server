@@ -66,21 +66,31 @@ app.put("/api/players", async (req, res) => {
 		const winningPlayers = req.body.winningTeamPlayers;
 		const losingPlayers = req.body.losingTeamPlayers;
 
-		for (winningPlayer in winningPlayers) {
-			const updatedWinningPlayer = new VolleyballPlayer({
-				wins: winningPlayer.wins + 1,
-			});
+		// Update winning players
+		await Promise.all(
+			Object.entries(winningPlayers).map(async ([key, player]) => {
+				console.log("Updating winning player:", key, player);
+				const newWins = player.wins + 1;
+				const updatedWinningPlayer = { wins: newWins };
+				await VolleyballPlayer.findByIdAndUpdate(
+					key,
+					updatedWinningPlayer
+				);
+			})
+		);
 
-			await VolleyballPlayer.findByIdAndUpdate(winningPlayer._id, updatedWinningPlayer);
-		}
-
-		for (losingPlayer in losingPlayers) {
-			const updatedLosingPlayer = new VolleyballPlayer({
-				wins: losingPlayer.losses + 1,
-			});
-
-			await VolleyballPlayer.findByIdAndUpdate(losingPlayer._id, updatedLosingPlayer);
-		}
+		// Update losing players
+		await Promise.all(
+			Object.entries(losingPlayers).map(async ([key, player]) => {
+				console.log("Updating losing player:", key, player);
+				const newLosses = player.losses + 1;
+				const updatedLosingPlayer = { losses: newLosses };
+				await VolleyballPlayer.findByIdAndUpdate(
+					key,
+					updatedLosingPlayer
+				);
+			})
+		);
 
 		res.json("Players updated.");
 	} catch (error) {
