@@ -12,6 +12,9 @@ const VolleyballPlayerSchema = new Schema({
     losses: {
         type: Number,
     },
+    pointDifferential: {
+        type: Number,
+    },
 });
 
 module.exports = mongoose.model('VolleyballPlayer', VolleyballPlayerSchema);

@@ -65,13 +65,17 @@ app.put("/api/players", async (req, res) => {
 
 		const winningPlayers = req.body.winningTeamPlayers;
 		const losingPlayers = req.body.losingTeamPlayers;
+		const pointDifferential = req.body.pointDifferential;
 
 		// Update winning players
 		await Promise.all(
 			Object.entries(winningPlayers).map(async ([key, player]) => {
 				console.log("Updating winning player:", key, player);
-				const newWins = player.wins + 1;
-				const updatedWinningPlayer = { wins: newWins };
+				const updatedWinningPlayer = {
+					wins: (player.wins += 1),
+					pointDifferential: (player.pointDifferential +=
+						pointDifferential),
+				};
 				await VolleyballPlayer.findByIdAndUpdate(
 					key,
 					updatedWinningPlayer
@@ -83,8 +87,11 @@ app.put("/api/players", async (req, res) => {
 		await Promise.all(
 			Object.entries(losingPlayers).map(async ([key, player]) => {
 				console.log("Updating losing player:", key, player);
-				const newLosses = player.losses + 1;
-				const updatedLosingPlayer = { losses: newLosses };
+				const updatedLosingPlayer = {
+					losses: (player.losses += 1),
+					pointDifferential: (player.pointDifferential -=
+						pointDifferential),
+				};
 				await VolleyballPlayer.findByIdAndUpdate(
 					key,
 					updatedLosingPlayer
@@ -123,7 +130,7 @@ app.put("/api/players/:slug", async (req, res) => {
 
 app.put("/api/reset-players", async (req, res) => {
 	try {
-		await VolleyballPlayer.updateMany({}, { $set: { wins: 0, losses: 0 } });
+		await VolleyballPlayer.updateMany({}, { $set: { wins: 0, losses: 0, pointDifferential: 0 } });
 		res.json("All player wins and losses reset to 0.");
 	} catch (error) {
 		console.error("Error resetting player stats:", error);
